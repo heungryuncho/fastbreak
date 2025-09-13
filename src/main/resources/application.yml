@@ -1,0 +1,26 @@
+# src/main/resources/application.yml
+
+spring:
+  # --- 'local' ????? ????? application-local.yml? ??? ?? ---
+  profiles:
+    active: local
+
+  # --- JPA(Hibernate) ?? ?? ---
+  jpa:
+    hibernate:
+      ddl-auto: update # ?? ???? update ??
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: false
+
+  # --- Thymeleaf ?? ---
+  thymeleaf:
+    cache: false # ?? ? ?? ????
+
+# --- ?? ?? ?? ---
+logging:
+  level:
+    org.hibernate.SQL: debug # ???? SQL ?? ??? ??
+    
