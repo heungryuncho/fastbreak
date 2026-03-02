@@ -1,4 +1,4 @@
-package com.portfolio.fastbreak.global;
+package com.portfolio.fastbreak.global.common;
 
 import org.springframework.http.HttpStatus;
 
