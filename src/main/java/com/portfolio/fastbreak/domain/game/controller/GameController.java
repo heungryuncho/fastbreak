@@ -1,22 +1,32 @@
 package com.portfolio.fastbreak.domain.game.controller;
 
+import com.portfolio.fastbreak.domain.game.dto.GameRequest;
+import com.portfolio.fastbreak.domain.game.dto.GameResponse;
+import com.portfolio.fastbreak.domain.game.service.GameService;
 import com.portfolio.fastbreak.global.common.ApiResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/games")
 public class GameController {
-    // 1. 정상 응답 테스트용 API
-    @GetMapping("/health")
-    public ApiResponse<String> checkHealth() {
-        return ApiResponse.success("Fastbrerak API Server is running!");
+
+    private final GameService gameService;
+
+    // 경기 등록 API
+    @PostMapping
+    public ApiResponse<GameResponse.GameInfoResponse> createGame(@RequestBody GameRequest.CreateGameRequest request) {
+        GameResponse.GameInfoResponse response = gameService.createGame(request);
+        return ApiResponse.success(response, "새로운 경기가 등록되었습니다.");
     }
 
-    // 2. 예외 처리 동작 테스트용 API
-    @GetMapping("/error-test")
-    public ApiResponse<Void> testError() {
-        throw new RuntimeException("전역 예외 처리 테스트용 강제 에러 발생");
+    // 전체 경기 목록 조회 API
+    @GetMapping
+    public ApiResponse<List<GameResponse.GameInfoResponse>> getAllgames() {
+        List<GameResponse.GameInfoResponse> responseList = gameService.getAllGames();
+        return ApiResponse.success(responseList, "전체 경기 목록 조회 성공");
     }
 }
