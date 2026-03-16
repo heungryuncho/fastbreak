@@ -49,8 +49,8 @@ public class ReservationServiceTest {
         Long targetSeatId = seats.get(0).id();
 
         // 4. 예매 진행
-        ReservationRequest.CreateReservationRequest reserveRequest = new ReservationRequest.CreateReservationRequest(memberInfo.id(), targetSeatId);
-        ReservationResponse.ReservationInfoResponse resInfo = reservationService.reserve(reserveRequest);
+        ReservationRequest.CreateReservationRequest reserveRequest = new ReservationRequest.CreateReservationRequest(targetSeatId);
+        ReservationResponse.ReservationInfoResponse resInfo = reservationService.reserve(reserveRequest, "test@test.com");
 
         // 5. 결과 검증
         assertThat(resInfo.status()).isEqualTo(ReservationStatus.COMPLETED);
@@ -58,7 +58,7 @@ public class ReservationServiceTest {
         assertThat(resInfo.gameTitle()).isEqualTo("서울 결승전");
 
         // 6. 내 예매 목록 조회하여 결과 재확인
-        List<ReservationResponse.ReservationInfoResponse> myReservations = reservationService.getMyReservations(memberInfo.id());
+        List<ReservationResponse.ReservationInfoResponse> myReservations = reservationService.getMyReservations("test@test.com");
         assertThat(myReservations).hasSize(1);
     }
 
@@ -74,10 +74,10 @@ public class ReservationServiceTest {
         Long targetSeatId = seatService.getSeatsByGameId(gameInfo.id()).get(0).id();
 
         // 2. 유저1이 먼저 타겟 좌석 예매 완료
-        reservationService.reserve(new ReservationRequest.CreateReservationRequest(member1.id(), targetSeatId));
+        reservationService.reserve(new ReservationRequest.CreateReservationRequest(targetSeatId), "user1@test.com");
 
         // 3. 유저2가 동일한 타겟 좌석 예매 시도 -> 예외 무조건 발생
-        assertThatThrownBy(() -> reservationService.reserve(new ReservationRequest.CreateReservationRequest(member2.id(), targetSeatId)))
+        assertThatThrownBy(() -> reservationService.reserve(new ReservationRequest.CreateReservationRequest(targetSeatId), "user2@test.com"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("이미 예매된 좌석입니다.");
     }

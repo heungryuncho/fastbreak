@@ -26,10 +26,10 @@ public class ReservationService {
 
     // 1. 예매 하기
     @Transactional
-    public ReservationResponse.ReservationInfoResponse reserve(ReservationRequest.CreateReservationRequest request) {
+    public ReservationResponse.ReservationInfoResponse reserve(ReservationRequest.CreateReservationRequest request, String email) {
         // 1. 회원 검증
-        Member member = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석입니다."));
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         // 2. 좌석 검증
         Seat seat = seatRepository.findById(request.seatId())
@@ -61,8 +61,11 @@ public class ReservationService {
 
     // 2. 내 예매 목록 조회
     @Transactional(readOnly = true)
-    public List<ReservationResponse.ReservationInfoResponse> getMyReservations(Long memberId) {
-        List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+    public List<ReservationResponse.ReservationInfoResponse> getMyReservations(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        List<Reservation> reservations = reservationRepository.findByMemberId(member.getId());
 
         return reservations.stream()
                 .map(res -> new ReservationResponse.ReservationInfoResponse(
@@ -78,13 +81,13 @@ public class ReservationService {
 
     // 3. 예매 취소
     @Transactional
-    public void cancelReservation(Long reservationId, Long memberId) {
+    public void cancelReservation(Long reservationId, String email) {
         // 예약 내역 조회
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
 
         // 본인 확인
-        if (!reservation.getMember().getId().equals(memberId)) {
+        if (!reservation.getMember().getEmail().equals(email)) {
             throw new IllegalArgumentException("본인의 예약만 취소할 수 있습니다.");
         }
 

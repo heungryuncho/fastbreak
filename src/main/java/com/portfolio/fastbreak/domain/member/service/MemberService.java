@@ -4,6 +4,7 @@ import com.portfolio.fastbreak.domain.member.dto.MemberRequest;
 import com.portfolio.fastbreak.domain.member.dto.MemberResponse;
 import com.portfolio.fastbreak.domain.member.entity.Member;
 import com.portfolio.fastbreak.domain.member.repository.MemberRepository;
+import com.portfolio.fastbreak.global.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public MemberResponse.MemberInfoResponse signup(MemberRequest.SignUpRequest request) {
@@ -49,7 +51,10 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 3. 성공 시 응답
-        return new MemberResponse.LoginResponse(member.getEmail(), "dummy-token");
+        // 3. 로그인 성공 시 JWT 토큰 발급
+        String token = jwtUtil.generateToken(member.getEmail());
+
+        // 4. 발급된 토큰 반환
+        return new MemberResponse.LoginResponse(member.getEmail(), token);
     }
 }
