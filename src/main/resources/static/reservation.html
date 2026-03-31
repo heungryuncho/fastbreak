@@ -1,0 +1,38 @@
+<!-- src/main/resources/static/reservation.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Fastbreak - 좌석 선택</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<div class="container reservation-view">
+    <header>
+        <button onclick="location.href='index.html'">⬅ 뒤로가기</button>
+        <h2 id="game-title">경기 정보 로딩 중...</h2>
+        <div class="status-legend">
+            <span class="badge available">선택 가능</span>
+            <span class="badge pending">결제 대기</span>
+            <span class="badge reserved">예매 완료</span>
+        </div>
+    </header>
+
+    <main class="seat-map-container">
+        <div class="court">🏀 COURT</div>
+        <div id="seat-grid" class="seat-grid">
+        </div>
+    </main>
+
+    <aside class="selected-info">
+        <h3>내 예매 정보</h3>
+        <div id="selection-box">좌석을 선택해 주세요.</div>
+        <button id="pay-button" style="display:none;" class="btn-primary">결제하기</button>
+        <div id="timer" class="timer"></div>
+    </aside>
+</div>
+<script src="reservation.js"></script>
+</body>
+</html>

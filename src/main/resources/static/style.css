@@ -1,0 +1,49 @@
+/* src/main/resources/static/style.css */
+:root {
+    --primary-color: #ff6b00;
+    --bg-dark: #121212;
+    --card-bg: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 40px; }
+
+header h1 { font-size: 3rem; background: linear-gradient(to right, #ff6b00, #ffba00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* 좌석 그리드 레이아웃 */
+.seat-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 12px;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 20px;
+}
+
+.seat {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+    font-weight: bold;
+}
+
+.seat.available { background: #444; }
+.seat.available:hover { background: var(--primary-color); transform: scale(1.1); }
+.seat.pending { background: #7b2cbf; cursor: not-allowed; }
+.seat.reserved { background: #555; opacity: 0.3; cursor: not-allowed; }
+
+.court {
+    text-align: center; margin-bottom: 30px; padding: 20px;
+    border: 3px solid #ff6b00; border-radius: 10px;
+    font-weight: 800; font-size: 1.5rem; color: #ff6b00;
+}
