@@ -81,4 +81,54 @@ public class GameService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    // 등급별 가격 결정
+    private int getPriceForGrade(SeatGrade grade, GameRequest.CreateGameRequest request) {
+        return switch (grade) {
+            case VIP -> (request.vipPrice() != null) ? request.vipPrice() : grade.getDefaultPrice();
+            case R -> (request.rPrice() != null) ? request.rPrice() : grade.getDefaultPrice();
+            case S -> (request.sPrice() != null) ? request.sPrice() : grade.getDefaultPrice();
+            case GENERAL -> (request.generalPrice() != null) ? request.generalPrice() : grade.getDefaultPrice();
+        };
+    }
+
+    // 좌석 번호와 전체 좌석 수에 따라 등급 판단
+    private SeatGrade determineGrade(int seatNumber, int totalSeats) {
+        double ratio = (double) seatNumber / totalSeats;
+
+        if (ratio <= 0.1) return SeatGrade.VIP;
+        if (ratio <= 0.3) return SeatGrade.R;
+        if (ratio <= 0.6) return SeatGrade.S;
+        return SeatGrade.GENERAL;
+    }
+
+    // 관리자
+    @Transactional(readOnly = true)
+    public GameResponse.GameStatsResponse getGameStats(Long gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 경기입니다."));
+
+        List<Seat> seats = seatRepository.findByGameIdOrderBySeatNumberAsc(gameId);
+
+        long totalSeats = seats.size();
+        long reservedSeats = seats.stream()
+                .filter(seat -> seat.getStatus() == SeatStatus.RESERVED)
+                .count();
+
+        long totalRevenue = seats.stream()
+                .filter(seat -> seat.getStatus() == SeatStatus.RESERVED)
+                .mapToLong(Seat::getPrice)
+                .sum();
+
+        double reservedRate = (totalSeats > 0) ? (double) reservedSeats / totalSeats * 100 : 0.0;
+
+        return new GameResponse.GameStatsResponse(
+                game.getId(),
+                game.getTitle(),
+                (int) totalSeats,
+                reservedSeats,
+                reservedRate,
+                totalRevenue
+        );
+    }
 }

@@ -37,6 +37,12 @@ public class SecurityConfig {
                         // 경기 목록 / 좌석 조회는 누구나 가능
                         .requestMatchers("/api/v1/games/**").permitAll()
 
+                        // 관리자 전용
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // 웹소켓 연결 경로는 누구나
+                        .requestMatchers("/ws-reservation/**").permitAll()
+
                         // 그 외 모든 요청은 JWT 인증 필수
                         .anyRequest().authenticated())
 
