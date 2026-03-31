@@ -13,6 +13,7 @@ import com.portfolio.fastbreak.domain.seat.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class ReservationService {
     private final SeatRepository seatRepository;
     private final RedissonClient redissonClient;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // 1. 예매 하기
     @Transactional
@@ -79,7 +81,11 @@ public class ReservationService {
                     )
             );
 
-            // 7. 응답 반환
+            // 7. 해당 경기의 좌석 캐시 삭제 (상태가 변했으므로 다음 조회 사용자는 DB에서 업데이트된 정보를 가져와야함)
+            String cacheKey = "game:" + gameId + ":seats";
+            redisTemplate.delete(cacheKey);
+
+            // 8. 응답 반환
             return new ReservationResponse.ReservationInfoResponse(
                     savedReservation.getId(),
                     savedReservation.getSeat().getGame().getTitle(),

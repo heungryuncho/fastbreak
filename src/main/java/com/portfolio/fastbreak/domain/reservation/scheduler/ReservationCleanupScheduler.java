@@ -5,12 +5,14 @@ import com.portfolio.fastbreak.domain.reservation.entity.ReservationStatus;
 import com.portfolio.fastbreak.domain.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -18,6 +20,7 @@ import java.util.List;
 public class ReservationCleanupScheduler {
 
     private final ReservationRepository reservationRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // 1분마다 실행 (미결제 5분 경과 여부 확인)
     @Scheduled(fixedRate = 60000)
@@ -34,6 +37,7 @@ public class ReservationCleanupScheduler {
         for (Reservation res : expiredReservations) {
             log.info("만료된 reservationID: {}, Seat: {}", res.getId(), res.getSeat().getSeatNumber());
             res.cancel();
+            redisTemplate.delete("game:" + res.getSeat().getGame().getId() + ":seats");
         }
     }
 }
