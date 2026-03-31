@@ -5,6 +5,7 @@ import com.portfolio.fastbreak.domain.game.dto.GameResponse;
 import com.portfolio.fastbreak.domain.game.entity.Game;
 import com.portfolio.fastbreak.domain.game.repository.GameRepository;
 import com.portfolio.fastbreak.domain.seat.entity.Seat;
+import com.portfolio.fastbreak.domain.seat.entity.SeatGrade;
 import com.portfolio.fastbreak.domain.seat.entity.SeatStatus;
 import com.portfolio.fastbreak.domain.seat.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +37,20 @@ public class GameService {
         Game savedGame = gameRepository.save(game);
 
         // 좌석 생성
+        int totalSeats = (request.totalSeats() != null) ? request.totalSeats() : 50;
         List<Seat> seats = new ArrayList<>();
-        for (int i = 1; i <= 50; i++) {
+
+        for (int i = 1; i <= totalSeats; i++) {
+            SeatGrade grade = determineGrade(i, totalSeats);
+
+            // 등급별 가격 결정
+            int price = getPriceForGrade(grade, request);
+
             Seat seat = Seat.builder()
                     .game(savedGame)
                     .seatNumber(i)
-                    .price(10000)
+                    .grade(grade)
+                    .price(price)
                     .status(SeatStatus.AVAILABLE)
                     .build();
             seats.add(seat);
