@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SeatRepository extends JpaRepository<Seat, Long> {
-    // 특정 경기에 속한 모든 좌석을 조회
-    List<Seat> findByGameId(Long gameId);
+    // 특정 경기에 속한 모든 좌석을 조회 (오름차순으로)
+    List<Seat> findByGameIdOrderBySeatNumberAsc(Long gameId);
 }

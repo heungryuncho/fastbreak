@@ -18,12 +18,13 @@ public class SeatService {
 
     @Transactional(readOnly = true)
     public List<SeatResponse.SeatInfoResponse> getSeatsByGameId(Long gameId) {
-        List<Seat> seats = seatRepository.findByGameId(gameId);
+        List<Seat> seats = seatRepository.findByGameIdOrderBySeatNumberAsc(gameId);
 
         return seats.stream()
                 .map(seat -> new SeatResponse.SeatInfoResponse(
                         seat.getId(),
                         seat.getSeatNumber(),
+                        seat.getGrade(),
                         seat.getPrice(),
                         seat.getStatus()
                 ))
