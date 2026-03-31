@@ -32,7 +32,14 @@ public class ReservationController {
         return ApiResponse.success(responseList, "내 예매 내역 조회 성공");
     }
 
-    // 3. 예매 취소
+    // 3. 결제 완료
+    @PatchMapping("/{reservationId}/pay")
+    public ApiResponse<Void> completePayment(@PathVariable("reservationId") Long reservationId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        reservationService.completePayment(reservationId, userDetails.getUsername());
+        return ApiResponse.success(null, "결제가 완료되었습니다.");
+    }
+
+    // 4. 예매 취소
     @PatchMapping("/{reservationId}/cancel")
     public ApiResponse<Void> cancelReservation(@PathVariable("reservationId") Long reservationId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         reservationService.cancelReservation(reservationId, userDetails.getUsername());

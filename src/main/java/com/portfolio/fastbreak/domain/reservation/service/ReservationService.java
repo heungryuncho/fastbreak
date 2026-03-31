@@ -61,7 +61,7 @@ public class ReservationService {
             Reservation reservation = Reservation.builder()
                     .member(member)
                     .seat(seat)
-                    .status(ReservationStatus.COMPLETED)
+                    .status(ReservationStatus.PENDING)
                     .build();
 
             // 5. DB 저장
@@ -118,7 +118,20 @@ public class ReservationService {
                 .collect(Collectors.toList());
     }
 
-    // 3. 예매 취소
+    // 3. 결제 완료
+    @Transactional
+    public void completePayment(Long reservationId, String email) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재 하지 않는 예약입니다."));
+
+        if (!reservation.getMember().getEmail().equals(email)) {
+            throw new IllegalArgumentException("본인의 예약만 결제할 수 있습니다.");
+        }
+
+        reservation.complete(); // 상태 변경 (PENDING -> COMPLETED)
+    }
+
+    // 4. 예매 취소
     @Transactional
     public void cancelReservation(Long reservationId, String email) {
         // 예약 내역 조회

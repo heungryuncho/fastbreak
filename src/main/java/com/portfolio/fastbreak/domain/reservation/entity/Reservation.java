@@ -46,7 +46,15 @@ public class Reservation {
         this.status = status;
     }
 
-    // 예매 취소 시
+    // 결제 완료 처리
+    public void complete() {
+        if (this.status != ReservationStatus.PENDING) {
+            throw new IllegalStateException("결제 대기 상태의 예약만 완료할 수 있습니다.");
+        }
+        this.status = ReservationStatus.COMPLETED;
+    }
+
+    // 예매 취소 및 미결제 만료
     public void cancel() {
         if (this.status == ReservationStatus.CANCELLED) {
             throw new IllegalStateException("이미 취소된 예매입니다.");
