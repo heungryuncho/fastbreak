@@ -1,6 +1,8 @@
 package com.portfolio.fastbreak.domain.seat.entity;
 
 import com.portfolio.fastbreak.domain.game.entity.Game;
+import com.portfolio.fastbreak.global.error.ErrorCode;
+import com.portfolio.fastbreak.global.error.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,17 +27,22 @@ public class Seat {
     @Column(nullable = false)
     private Integer seatNumber; // 좌석 번호
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Integer price;  // 좌석 가격
+    private SeatGrade grade;
+
+    @Column(nullable = false)
+    private Integer price; // 좌석 가격
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SeatStatus status;
 
     @Builder
-    public Seat(Game game, Integer seatNumber, Integer price, SeatStatus status) {
+    public Seat(Game game, Integer seatNumber, SeatGrade grade, Integer price, SeatStatus status) {
         this.game = game;
         this.seatNumber = seatNumber;
+        this.grade = grade;
         this.price = price;
         this.status = status;
     }
@@ -43,7 +50,7 @@ public class Seat {
     // 예매 시 상태 변경
     public void reserve() {
         if (this.status == SeatStatus.RESERVED) {
-            throw new IllegalStateException("이미 예매된 좌석입니다.");
+            throw new BusinessException(ErrorCode.SEAT_ALREADY_RESERVED);
         }
         this.status = SeatStatus.RESERVED;
     }
