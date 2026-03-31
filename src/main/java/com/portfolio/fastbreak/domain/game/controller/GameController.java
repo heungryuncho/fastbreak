@@ -29,4 +29,10 @@ public class GameController {
         List<GameResponse.GameInfoResponse> responseList = gameService.getAllGames();
         return ApiResponse.success(responseList, "전체 경기 목록 조회 성공");
     }
+
+    @GetMapping("/search")
+    public ApiResponse<List<GameResponse.GameInfoResponse>> searchGames(GameRequest.GameSearchRequest request) {
+        List<GameResponse.GameInfoResponse> responseList = gameService.searchGames(request);
+        return ApiResponse.success(responseList, "검색 결과 조회 성공");
+    }
 }

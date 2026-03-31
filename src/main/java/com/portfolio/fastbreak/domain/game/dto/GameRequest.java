@@ -13,4 +13,11 @@ public class GameRequest {
             Integer sPrice,
             Integer generalPrice
     ) {}
+
+    public record GameSearchRequest(
+            String title,
+            String location,
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime
+    ) {}
 }

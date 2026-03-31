@@ -131,4 +131,17 @@ public class GameService {
                 totalRevenue
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<GameResponse.GameInfoResponse> searchGames(GameRequest.GameSearchRequest request) {
+        List<Game> games = gameRepository.searchGames(request);
+        return games.stream()
+                .map(game -> new GameResponse.GameInfoResponse(
+                        game.getId(),
+                        game.getTitle(),
+                        game.getGameDateTime(),
+                        game.getLocation()
+                ))
+                .collect(Collectors.toList());
+    }
 }
