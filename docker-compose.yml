@@ -1,26 +1,48 @@
 version: '3.8'
 services:
-  mysql:
+  db:
     image: mysql:8.0
-    container_name: fastbreak-mysql
+    container_name: fastbreak-db
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: fastbreak_db
+      MYSQL_DATABASE: fastbreak
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - mysql-data:/var/lib/mysql
     restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
-    image: redis:7.2
+    image: redis:latest
     container_name: fastbreak-redis
     ports:
       - "6379:6379"
     restart: always
+
+  app:
+    build: .
+    container_name: fastbreak-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/fastbreak?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&rewriteBatchedStatements=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
 volumes:
   mysql-data:
